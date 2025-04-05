@@ -35,7 +35,7 @@ def as_string(word_counts: WordCounts) -> str:
     header = "".join(c.string() for c in columns.values())
     array_width = sum(c.width for c in columns.values())
 
-    res = ""
+    res = "\n"
     res += header + "\n"
     res += "-" * array_width + "\n"
     for wc in word_counts._word_counts:
@@ -49,15 +49,14 @@ def as_string(word_counts: WordCounts) -> str:
     return res
 
 
-
-
-
 def test_display_word_count():
     string = as_string(WordCounts([WordCount("x", 1, 1, 1)]))
     print(string)
-    expected = dedent("""\
-    word                         #      span  proportion
-    ----------------------------------------------------
-    x                            1         1        100%
-    """)
+    expected = dedent(
+        """
+        word                         #      span  proportion
+        ----------------------------------------------------
+        x                            1         1        100%
+        """
+    )
     assert string == expected
