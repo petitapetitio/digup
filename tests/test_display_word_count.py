@@ -49,15 +49,15 @@ def as_string(word_counts: WordCounts) -> str:
     return res
 
 
-expected = """\
-word                         #      span  proportion
-----------------------------------------------------
-x                            1         1        100%
-"""
+
 
 
 def test_display_word_count():
     string = as_string(WordCounts([WordCount("x", 1, 1, 1)]))
     print(string)
-    # string =
+    expected = dedent("""\
+    word                         #      span  proportion
+    ----------------------------------------------------
+    x                            1         1        100%
+    """)
     assert string == expected
