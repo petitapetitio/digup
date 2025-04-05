@@ -1,6 +1,9 @@
-*.dtmp
 *.idea
 .DS_Store
 **.pytest_cache
 **/__pycache__/
+
+# draw.io files
+*.dtmp
+*.bkp
 
