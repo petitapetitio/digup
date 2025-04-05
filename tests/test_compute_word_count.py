@@ -2,7 +2,7 @@ from textwrap import dedent
 
 import parso
 
-from src.word_count import WordCount, WordCounts, word_counts
+from src.count_words import WordCount, WordCounts, word_counts
 
 
 def test_1():
