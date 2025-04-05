@@ -2,23 +2,8 @@ from dataclasses import dataclass
 from textwrap import dedent
 
 import parso
-from parso.python.tree import Function
-
-func = """
-def fibonacci(n: int, memo: dict[int, int] = None) -> int:
-    if memo is None:
-        memo = {}
-    if n in memo:
-        return memo[n]
-    if n <= 1:
-        return n
-    result = fibonacci(n - 1, memo) + fibonacci(n - 2, memo)
-    memo[n] = result
-    return result
-"""
-
-
-# ignore keywords, delimiters, operators
+from parso.python.tree import Function, PythonNode
+from parso.tree import NodeOrLeaf
 
 
 @dataclass(frozen=True)
@@ -65,22 +50,59 @@ def test_3():
     assert word_counts(function) == WordCounts([WordCount("x", 2, 2, 2)])
 
 
+def test_a_complex_case():
+    code = dedent("""\
+    def process_items(items):
+        if not items:
+            log("No items to process.")
+            return
+    
+        for item in items:
+            if is_valid(item):
+                handle(item)
+            else:
+                warn("Invalid item:", item)
+        notify("Processing complete.")
+    """)
+    p = parso.parse(code)
+    function = p.children[0]
+    assert word_counts(function) == WordCounts([
+        WordCount("items", 3, 6, 11),
+        WordCount("log", 1, 1, 11),
+        WordCount("item", 4, 5, 11),
+        WordCount("is_valid", 1, 1, 11),
+        WordCount("handle", 1, 1, 11),
+        WordCount("warn", 1, 1, 11),
+        WordCount("notify", 1, 1, 11),
+    ])
+
+
+def get_identifiers(node: NodeOrLeaf):
+    if node.type == "name":
+        yield node
+    if hasattr(node, "children"):
+        for child in node.children:
+            yield from get_identifiers(child)
+
+
 def word_counts(function: Function) -> WordCounts:
     func_len = function.end_pos[0] - function.start_pos[0]
-    params = function.get_params()  # []
     word_count = {}
     word_line_start = {}
     word_line_end = {}
-    for p in params:
-        if p.name.value not in word_count:
-            word_count[p.name.value] = 1
-            word_line_start[p.name.value] = p.name.start_pos[0]
-            word_line_end[p.name.value] = p.name.start_pos[0]
-        else:
-            word_count[p.name.value] += 1
-            word_line_end[p.name.value] = p.name.start_pos[0]
 
-    # for elt in function.children:
+    names = get_identifiers(function)
+    for name in names:
+        if name.parent.type == "funcdef":
+            continue
+        if name.value not in word_count:
+            word_count[name.value] = 1
+            word_line_start[name.value] = name.start_pos[0]
+            word_line_end[name.value] = name.start_pos[0]
+        else:
+            word_count[name.value] += 1
+            word_line_end[name.value] = name.start_pos[0]
+
     return WordCounts(
         [
             WordCount(
@@ -88,7 +110,7 @@ def word_counts(function: Function) -> WordCounts:
                 word_count[w],
                 word_line_end[w] - word_line_start[w] + 1,
                 func_len,
-            )
+                )
             for w in word_count.keys()
         ]
     )
