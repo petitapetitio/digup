@@ -1,7 +1,8 @@
-from dataclasses import dataclass
+from __future__ import annotations
 
-from parso.python.tree import Function, Name
-from parso.tree import NodeOrLeaf
+import ast
+from dataclasses import dataclass
+from typing import Iterable
 
 
 @dataclass(frozen=True)
@@ -16,32 +17,41 @@ class WordCount:
 class WordCounts:
     _word_counts: list[WordCount]
 
-
-def get_identifiers(node: NodeOrLeaf):
-    if node.type == Name.type:
-        yield node
-    if hasattr(node, "children"):
-        for child in node.children:
-            yield from get_identifiers(child)
+    @classmethod
+    def of(cls, word_counts: list[WordCount]) -> WordCounts:
+        return WordCounts(sorted(word_counts, key=lambda wc: wc.occurences))
 
 
-def word_counts(function: Function) -> WordCounts:
-    func_len = function.end_pos[0] - function.start_pos[0]
+@dataclass(frozen=True)
+class Identifier:
+    name: str
+    lineno: int
+    column: int
+
+
+def get_identifiers(node: ast.FunctionDef) -> Iterable[Identifier]:
+    for child in ast.walk(node):
+        if isinstance(child, ast.arg):
+            yield Identifier(child.arg, child.lineno, child.col_offset)
+        if isinstance(child, ast.Name):
+            yield Identifier(child.id, child.lineno, child.col_offset)
+
+
+def word_counts(function: ast.FunctionDef) -> WordCounts:
+    func_len = function.end_lineno - function.lineno + 1
     word_count = {}
     word_line_start = {}
     word_line_end = {}
 
-    names = get_identifiers(function)
-    for name in names:
-        if name.parent.type == Function.type:
-            continue
-        if name.value not in word_count:
-            word_count[name.value] = 1
-            word_line_start[name.value] = name.start_pos[0]
-            word_line_end[name.value] = name.start_pos[0]
+    for identifier in sorted(get_identifiers(function), key=lambda idf: (idf.lineno, idf.column)):
+        name_encountered_for_the_first_time = identifier.name not in word_count
+        if name_encountered_for_the_first_time:
+            word_count[identifier.name] = 1
+            word_line_start[identifier.name] = identifier.lineno
+            word_line_end[identifier.name] = identifier.lineno
         else:
-            word_count[name.value] += 1
-            word_line_end[name.value] = name.start_pos[0]
+            word_count[identifier.name] += 1
+            word_line_end[identifier.name] = identifier.lineno
 
     return WordCounts(
         [
@@ -50,7 +60,7 @@ def word_counts(function: Function) -> WordCounts:
                 word_count[w],
                 word_line_end[w] - word_line_start[w] + 1,
                 func_len,
-                )
+            )
             for w in word_count.keys()
         ]
     )

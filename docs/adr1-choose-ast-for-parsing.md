@@ -52,9 +52,10 @@ Cons :
 Pros : 
 - ✅ included in the standard library
 - ✅ well documented
+- ✅ fast
 
 Cons : 
-- ❌ lack features like precs position
+- ❌ design a bit awkward (ie ast.arg isn't a subclass of ast.name)
 
 ### Using Parso
 
@@ -67,10 +68,15 @@ Pros :
 
 Cons : 
 - ❌ dependency on a third party lib
-- ❌ slower than AST
-
+- ❌ seems slower than AST - because written in python ([ref](https://github.com/Khan/slicker/issues/30), [ref](https://medium.com/@boxed/a-quick-performance-comparison-of-python-parsers-eb86497ac733))
 
 
 ## Decision
 
-**Decision** : In this context we decided for \<option X> to achieve \<goal> accepting \<downside>.
+I made my the first draft with parso.
+
+But I will start with ast: it's faster, more standard, and looks simpler to me.
+
+I will consider switching to parso if I miss features.
+
+To facilitate such evolution, I'll try to keep the parsing lib at the edges and work on iterators over custom datastructures.
