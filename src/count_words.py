@@ -17,10 +17,6 @@ class WordCount:
 class WordCounts:
     _word_counts: list[WordCount]
 
-    @classmethod
-    def of(cls, word_counts: list[WordCount]) -> WordCounts:
-        return WordCounts(sorted(word_counts, key=lambda wc: wc.occurences))
-
 
 @dataclass(frozen=True)
 class Identifier:
