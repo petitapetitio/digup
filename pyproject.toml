@@ -1,3 +1,26 @@
+[project]
+name = "digup"
+version = "0.0.1"
+authors = [
+  { name="Alexandre Petit" },
+]
+description = "Your cli buddy to dig up knowledge from legacy code"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICENSE*"]
+
+[build-system]
+requires = ["hatchling >= 1.27"]
+build-backend = "hatchling.build"
 
 [tool.black]
 line-length = 120
+
+[tool.pytest.ini_options]
+pythonpath = "."
+testpaths = ["tests"]
