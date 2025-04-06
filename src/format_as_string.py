@@ -14,7 +14,8 @@ def as_string(word_counts: WordCounts) -> str:
     header = "".join(c.string() for c in columns.values())
     array_width = sum(c.width for c in columns.values())
 
-    res = "\n"
+    res = ""
+    res += "-" * array_width + "\n"
     res += header + "\n"
     res += "-" * array_width + "\n"
     for wc in word_counts._word_counts:

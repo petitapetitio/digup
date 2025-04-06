@@ -20,6 +20,7 @@ def test_selecting_in_a_file_with_several_functions():
     functions = list(get_functions(_here / Path("test_data/selecting_a_function/one_among_several"), "function_a"))
     assert len(functions) == 1
     assert functions[0].name == "function_a"
+    assert functions[0].location == "file.py::function_a"
 
 
 def test_selecting_in_a_subdirectory():
@@ -28,16 +29,18 @@ def test_selecting_in_a_subdirectory():
     assert functions[0].name == "function_a"
 
 
-def test_selecting_a_method():
+def test_selecting_a_method_in_a_simple_class():
     functions = list(get_functions(_here / Path("test_data/selecting_a_function/in_a_class"), "method_a"))
     assert len(functions) == 1
     assert functions[0].name == "method_a"
+    assert functions[0].location == "file.py::A::method_a"
 
 
 def test_selecting_a_method_in_a_nested_class():
     functions = list(get_functions(_here / Path("test_data/selecting_a_function/in_a_nested_class"), "method_a"))
     assert len(functions) == 1
     assert functions[0].name == "method_a"
+    assert functions[0].location == "file.py::A::Nested::method_a"
 
 
 def test_selecting_when_several_matches():

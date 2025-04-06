@@ -21,7 +21,8 @@ def main():
 
     functions = get_functions(dirs[0], args.f)
     for function in functions:
-        print(as_string(word_counts(function)))
+        print(f"{function.location}: ")
+        print(as_string(word_counts(function.definition)))
 
 
 if __name__ == "__main__":
