@@ -1,12 +1,13 @@
 import ast
 from pathlib import Path
+from typing import Optional
 
 
-def select_function(pattern: str, folder: Path):
+def get_functions(folder: Path, pattern: Optional[str] = None):
     for source_file in folder.glob("**/*.py"):
         with open(source_file) as f:
             tree = ast.parse(f.read())
-            print(tree)
             for node in ast.walk(tree):
-                if isinstance(node, ast.FunctionDef) and pattern in node.name:
-                    yield node
+                if isinstance(node, ast.FunctionDef):
+                    if pattern is None or pattern in node.name:
+                        yield node

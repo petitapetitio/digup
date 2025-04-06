@@ -5,7 +5,7 @@ from src.count_words import WordCounts
 
 def as_string(word_counts: WordCounts) -> str:
     columns = {
-        "word": _Column("word", 20, "<"),
+        "word": _Column("word", 40, "<"),
         "occurences": _Column("#", 10, ">"),
         "span": _Column("span", 10, ">"),
         "proportion": _Column("proportion", 12, ">"),
