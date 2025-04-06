@@ -5,7 +5,8 @@ from src.count_words import word_counts
 from src.format_as_string import as_string
 from src.select_function import get_functions
 
-if __name__ == "__main__":
+
+def main():
     parser = ArgumentParser(
         usage=f"%(prog)s [options] [dir] [dir] [...]",
     )
@@ -21,3 +22,7 @@ if __name__ == "__main__":
     functions = get_functions(dirs[0], args.f)
     for function in functions:
         print(as_string(word_counts(function)))
+
+
+if __name__ == "__main__":
+    main()
