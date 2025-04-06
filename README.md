@@ -1,4 +1,8 @@
 
+
+## Developer documentation
+
+### How to install the project
 ```
 python -m venv ../venvs/digup312
 source ../venvs/digup312
