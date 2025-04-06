@@ -1,6 +1,6 @@
 # Dig up 
 
-cli-tool that helps you dig up knowledge from python legacy code.
+A cli-tool that helps you dig up knowledge from Python legacy code.
 
 ## How to use
 
