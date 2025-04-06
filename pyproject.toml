@@ -1,9 +1,7 @@
 [project]
 name = "digup"
-version = "0.0.1"
-authors = [
-  { name="Alexandre Petit" },
-]
+version = "0.0.2"
+authors = [{name="Alexandre Petit"}]
 description = "Your cli buddy to dig up knowledge from legacy code"
 readme = "README.md"
 requires-python = ">=3.8"
