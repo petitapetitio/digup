@@ -17,6 +17,9 @@ class WordCount:
 class WordCounts:
     _word_counts: list[WordCount]
 
+    def sorted_by_occurences(self) -> WordCounts:
+        return WordCounts(sorted(self._word_counts, key=lambda wc: wc.occurences, reverse=True))
+
 
 @dataclass(frozen=True)
 class Identifier:

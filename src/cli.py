@@ -22,7 +22,7 @@ def main():
     functions = get_functions(dirs[0], args.f)
     for function in functions:
         print(f"{function.location}: ")
-        print(as_string(word_counts(function.definition)))
+        print(as_string(word_counts(function.definition).sorted_by_occurences()))
 
 
 if __name__ == "__main__":
