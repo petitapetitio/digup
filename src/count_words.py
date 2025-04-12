@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass
+from enum import Enum, StrEnum
 from typing import Iterable
 
 
@@ -21,19 +22,25 @@ class WordCounts:
         return WordCounts(sorted(self._word_counts, key=lambda wc: wc.occurences, reverse=True))
 
 
+class IdentifierKind(StrEnum):
+    ARG = "arg"
+    NAME = "name"
+
+
 @dataclass(frozen=True)
 class Identifier:
     name: str
     lineno: int
     column: int
+    kind: IdentifierKind
 
 
 def get_identifiers(node: ast.FunctionDef) -> Iterable[Identifier]:
     for child in ast.walk(node):
         if isinstance(child, ast.arg):
-            yield Identifier(child.arg, child.lineno, child.col_offset)
+            yield Identifier(child.arg, child.lineno, child.col_offset, IdentifierKind.ARG)
         if isinstance(child, ast.Name):
-            yield Identifier(child.id, child.lineno, child.col_offset)
+            yield Identifier(child.id, child.lineno, child.col_offset, IdentifierKind.NAME)
 
 
 def word_counts(function: ast.FunctionDef) -> WordCounts:

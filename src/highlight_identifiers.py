@@ -3,7 +3,7 @@ from collections import defaultdict
 from textwrap import dedent
 from typing import cast, Optional
 
-from src.count_words import get_identifiers
+from src.count_words import get_identifiers, IdentifierKind
 from src.termcolor import colored
 
 
@@ -35,7 +35,7 @@ DISTINCT_RGB_COLORS = [
 ] + [(125, 125, 125)] * 1000
 
 
-def highlight_identifiers(code: str, only: Optional[set[str]] = None) -> str:
+def highlight_identifiers(code: str, only: Optional[set[str]] = None, params_only: bool = False) -> str:
     source = dedent(code)
     tree = ast.parse(source)
     f = cast(ast.FunctionDef, tree.body[0])
@@ -43,10 +43,13 @@ def highlight_identifiers(code: str, only: Optional[set[str]] = None) -> str:
 
     color_by_identifier = {}
     identifiers_by_line: dict[int, list] = defaultdict(list)
-    sorted_identifiers = sorted(get_identifiers(f), key=lambda idtf: (idtf.lineno, -idtf.column))
+    sorted_identifiers = sorted(get_identifiers(f), key=lambda idtf: (idtf.lineno, idtf.column))
     for identifier in sorted_identifiers:
         if only is not None and identifier.name not in only:
             continue
+        if params_only and identifier.kind != IdentifierKind.ARG and identifier.name not in color_by_identifier:
+            continue
+
         if identifier.name not in color_by_identifier:
             color = next(colors)
             color_by_identifier[identifier.name] = color
@@ -59,7 +62,7 @@ def highlight_identifiers(code: str, only: Optional[set[str]] = None) -> str:
             continue
 
         highlighted_line = line
-        for identifier in identifiers_by_line[lineno]:
+        for identifier in reversed(identifiers_by_line[lineno]):
             highlighted_identifier = colored(
                 identifier.name, color=color_by_identifier[identifier.name], force_color=True
             )

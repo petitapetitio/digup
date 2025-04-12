@@ -20,6 +20,7 @@ Commands:
 def main():
     parser = ArgumentParser(
         usage=USAGE,
+        add_help=True,
     )
     parser.add_argument("command")
     parser.add_argument(
@@ -45,6 +46,7 @@ def main():
 
     functions = get_functions_from_paths(dirs, args.function)
 
+    print()
     match command:
         case "wc":
             for function in functions:
@@ -53,12 +55,13 @@ def main():
         case "hi":
             hi_parser = ArgumentParser()
             hi_parser.add_argument("--word", "-w", type=str, nargs="*", default=None)
+            hi_parser.add_argument("--params-only", "-p", action="store_true", default=False)
             hi_args = hi_parser.parse_args(unknown)
             words = set(hi_args.word) if hi_args.word is not None else None
 
             for function in functions:
                 print(f"{function.location}: ")
-                print(highlight_identifiers(function.source, words))
+                print(highlight_identifiers(function.source, words, params_only=hi_args.params_only))
 
 
 if __name__ == "__main__":

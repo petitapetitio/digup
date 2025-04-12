@@ -30,7 +30,6 @@ def test_highlighting_only_some_identifiers():
     def f():
         a
         b
-        a
         c
     """
 
@@ -41,8 +40,27 @@ def test_highlighting_only_some_identifiers():
     def f():
         \x1b[38;2;0;130;200ma\x1b[0m
         \x1b[38;2;60;180;75mb\x1b[0m
-        \x1b[38;2;0;130;200ma\x1b[0m
         c
+    """
+    )
+
+
+def test_highlighting_params_only():
+    code = """
+    def f(a, b):
+        a
+        b
+        c = lambda x: x + 1
+    """
+
+    colored = highlight_identifiers(code, params_only=True)
+
+    assert colored == dedent(
+        f"""
+    def f(\x1b[38;2;0;130;200ma\x1b[0m, \x1b[38;2;60;180;75mb\x1b[0m):
+        \x1b[38;2;0;130;200ma\x1b[0m
+        \x1b[38;2;60;180;75mb\x1b[0m
+        c = lambda \x1b[38;2;230;25;75mx\x1b[0m: \x1b[38;2;230;25;75mx\x1b[0m + 1
     """
     )
 
