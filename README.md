@@ -11,7 +11,7 @@ pip install digup
 
 Then run
 ```
-digup -f my_long_function
+digup wc -f my_long_function
 ```
 to display the word count of the function and get hints about what to refactor:
 ```
