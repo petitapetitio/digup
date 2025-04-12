@@ -3,26 +3,35 @@ from pathlib import Path
 
 from src.count_words import word_counts
 from src.format_as_string import as_string
-from src.select_function import get_functions
+from src.highlight_identifiers import highlight_identifiers
+from src.get_functions import get_functions_from_paths
 
 
 def main():
     parser = ArgumentParser(
-        usage=f"%(prog)s [options] [dir] [dir] [...]",
+        usage=f"%(prog)s [options] COMMAND",
     )
-    parser.add_argument("dir", type=Path, nargs="*")
-    parser.add_argument("-f", required=False, help="function")
+    parser.add_argument("command")
+    parser.add_argument("--directory", "-d", type=Path, nargs="*", default=[Path()])
+    parser.add_argument("--function", "-f", required=False, help="function")
 
     args = parser.parse_args()
 
-    dirs = args.dir
-    if len(dirs) == 0:
-        dirs.append(Path())
+    command = args.command
 
-    functions = get_functions(dirs[0], args.f)
-    for function in functions:
-        print(f"{function.location}: ")
-        print(as_string(word_counts(function.definition).sorted_by_occurences()))
+    dirs = args.directory
+
+    functions = get_functions_from_paths(dirs, args.function)
+
+    match command:
+        case "wc":
+            for function in functions:
+                print(f"{function.location}: ")
+                print(as_string(word_counts(function.definition).sorted_by_occurences()))
+        case "hi":
+            for function in functions:
+                print(f"{function.location}: ")
+                print(highlight_identifiers(function.source))
 
 
 if __name__ == "__main__":

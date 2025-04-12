@@ -1,3 +1,1 @@
 def function_a(): ...
-
-

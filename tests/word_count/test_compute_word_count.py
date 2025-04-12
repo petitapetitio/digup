@@ -33,11 +33,13 @@ def test_4():
     def id(x, y=0, **args):
         return x
     """
-    assert word_counts(_function(code)) == WordCounts([
-        WordCount("x", 2, 2, 2),
-        WordCount("y", 1, 1, 2),
-        WordCount("args", 1, 1, 2),
-    ])
+    assert word_counts(_function(code)) == WordCounts(
+        [
+            WordCount("x", 2, 2, 2),
+            WordCount("y", 1, 1, 2),
+            WordCount("args", 1, 1, 2),
+        ]
+    )
 
 
 def test_a_complex_case():
