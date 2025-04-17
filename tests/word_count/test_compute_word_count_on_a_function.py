@@ -76,7 +76,7 @@ def test_a_complex_case():
         notify("Processing complete.")
     """
     assert _wc(code) == WordCount(
-        _word_counts=[
+        words=[
             Word(word="process_items", occurences=1, span=1),
             Word(word="items", occurences=3, span=6),
             Word(word="log", occurences=1, span=1),

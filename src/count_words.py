@@ -15,11 +15,11 @@ class Word:
 
 @dataclass(frozen=True)
 class WordCount:
-    _word_counts: list[Word]
+    words: list[Word]
     length: int
 
     def sorted_by_occurences(self) -> WordCount:
-        return WordCount(sorted(self._word_counts, key=lambda wc: wc.occurences, reverse=True), self.length)
+        return WordCount(sorted(self.words, key=lambda wc: wc.occurences, reverse=True), self.length)
 
 
 class IdentifierKind(StrEnum):
