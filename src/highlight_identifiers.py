@@ -36,14 +36,13 @@ DISTINCT_RGB_COLORS = [
 
 
 def highlight_identifiers(code: str, only: Optional[set[str]] = None, params_only: bool = False) -> str:
+    # TODO : je parse le code plusieurs fois ici, c'est un peu bête
     source = dedent(code)
     tree = ast.parse(source)
-    f = cast(ast.FunctionDef, tree.body[0])
     colors = iter(DISTINCT_RGB_COLORS)
-
     color_by_identifier = {}
     identifiers_by_line: dict[int, list] = defaultdict(list)
-    sorted_identifiers = sorted(get_identifiers(f), key=lambda idtf: (idtf.lineno, idtf.column))
+    sorted_identifiers = sorted(get_identifiers(tree), key=lambda idtf: (idtf.lineno, idtf.column))
     for identifier in sorted_identifiers:
         if only is not None and identifier.name not in only:
             continue

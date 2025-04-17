@@ -1,10 +1,10 @@
 from argparse import ArgumentParser
 from pathlib import Path
 
-from src.count_words import word_counts
+from src.count_words import word_count
 from src.format_as_string import as_string
 from src.highlight_identifiers import highlight_identifiers
-from src.get_functions import get_functions_from_paths
+from src.get_functions import get_functions, get_classes, get_modules
 
 USAGE = f"""\
 %(prog)s COMMAND [options]
@@ -31,37 +31,44 @@ def main():
         default=[Path()],
         help="Apply only to modules in these directories",
     )
+    parser.add_argument("--target", "-t", choices=["function", "class"])
     parser.add_argument(
-        "--function",
-        "-f",
-        required=False,
-        help="Apply only to functions that match",
+        "--search",
+        "-s",
+        nargs="?",
+        default="",
+        help="keep only nodes that match this location pattern",
     )
 
-    args, unknown = parser.parse_known_args()
-
+    args, remaining = parser.parse_known_args()
     command = args.command
-
     dirs = args.directory
+    target = args.target
 
-    functions = get_functions_from_paths(dirs, args.function)
+    match target:
+        case "function":
+            nodes = get_functions(dirs, args.search)
+        case "class":
+            nodes = get_classes(dirs, args.search)
+        case _:
+            nodes = get_modules(dirs, args.search)
 
     print()
     match command:
         case "wc":
-            for function in functions:
-                print(f"{function.location}: ")
-                print(as_string(word_counts(function.definition).sorted_by_occurences()))
+            for node in nodes:
+                print(f"{node.location} ")
+                print(as_string(word_count(node.definition, node.length).sorted_by_occurences()))
         case "hi":
             hi_parser = ArgumentParser()
             hi_parser.add_argument("--word", "-w", type=str, nargs="*", default=None)
             hi_parser.add_argument("--params-only", "-p", action="store_true", default=False)
-            hi_args = hi_parser.parse_args(unknown)
+            hi_args = hi_parser.parse_args(remaining)
             words = set(hi_args.word) if hi_args.word is not None else None
 
-            for function in functions:
-                print(f"{function.location}: ")
-                print(highlight_identifiers(function.source, words, params_only=hi_args.params_only))
+            for node in nodes:
+                print(f"{node.location} ")
+                print(highlight_identifiers(node.source, words, params_only=hi_args.params_only))
 
 
 if __name__ == "__main__":

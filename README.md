@@ -31,6 +31,21 @@ url                                              4        22         34%
 day                                              4        23         35%
 ```
 
+```bash
+digup wc
+
+# aggregate at the function level (all the functions)
+digup wc -f
+
+# aggregate at the function level (functions that contains my_long_function)
+digup wc -f my_long_function
+
+digup wc -c MyClass
+
+
+digup wc -d tests/test_data/selecting_class/a_class_in_a_sub_directory/
+
+```
 ## Developer documentation
 
 ### How to install the project

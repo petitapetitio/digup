@@ -7,24 +7,26 @@ from typing import Iterable
 
 
 @dataclass(frozen=True)
-class WordCount:
+class Word:
     word: str
     occurences: int
     span: int
-    function_length: int
 
 
 @dataclass(frozen=True)
-class WordCounts:
-    _word_counts: list[WordCount]
+class WordCount:
+    _word_counts: list[Word]
+    length: int
 
-    def sorted_by_occurences(self) -> WordCounts:
-        return WordCounts(sorted(self._word_counts, key=lambda wc: wc.occurences, reverse=True))
+    def sorted_by_occurences(self) -> WordCount:
+        return WordCount(sorted(self._word_counts, key=lambda wc: wc.occurences, reverse=True), self.length)
 
 
 class IdentifierKind(StrEnum):
     ARG = "arg"
     NAME = "name"
+    FUNCTION = "function"
+    CLASS = "class"
 
 
 @dataclass(frozen=True)
@@ -35,38 +37,44 @@ class Identifier:
     kind: IdentifierKind
 
 
-def get_identifiers(node: ast.FunctionDef) -> Iterable[Identifier]:
+def get_identifiers(node: ast.AST) -> Iterable[Identifier]:
     for child in ast.walk(node):
         if isinstance(child, ast.arg):
             yield Identifier(child.arg, child.lineno, child.col_offset, IdentifierKind.ARG)
-        if isinstance(child, ast.Name):
+        elif isinstance(child, ast.Name):
             yield Identifier(child.id, child.lineno, child.col_offset, IdentifierKind.NAME)
+        elif isinstance(child, ast.FunctionDef):
+            yield Identifier(child.name, child.lineno, child.col_offset + len("def "), IdentifierKind.FUNCTION)
+        elif isinstance(child, ast.ClassDef):
+            yield Identifier(child.name, child.lineno, child.col_offset + len("class "), IdentifierKind.CLASS)
+        # else:
+        #     print(f"ignored: {child}")
 
 
-def word_counts(function: ast.FunctionDef) -> WordCounts:
-    func_len = function.end_lineno - function.lineno + 1
-    word_count = {}
-    word_line_start = {}
-    word_line_end = {}
+def word_count(node: ast.AST, length: int) -> WordCount:
 
-    for identifier in sorted(get_identifiers(function), key=lambda idf: (idf.lineno, idf.column)):
-        name_encountered_for_the_first_time = identifier.name not in word_count
+    occurences = {}
+    line_start = {}
+    line_end = {}
+
+    for identifier in sorted(get_identifiers(node), key=lambda idf: (idf.lineno, idf.column)):
+        name_encountered_for_the_first_time = identifier.name not in occurences
         if name_encountered_for_the_first_time:
-            word_count[identifier.name] = 1
-            word_line_start[identifier.name] = identifier.lineno
-            word_line_end[identifier.name] = identifier.lineno
+            occurences[identifier.name] = 1
+            line_start[identifier.name] = identifier.lineno
+            line_end[identifier.name] = identifier.lineno
         else:
-            word_count[identifier.name] += 1
-            word_line_end[identifier.name] = identifier.lineno
+            occurences[identifier.name] += 1
+            line_end[identifier.name] = identifier.lineno
 
-    return WordCounts(
+    return WordCount(
         [
-            WordCount(
+            Word(
                 w,
-                word_count[w],
-                word_line_end[w] - word_line_start[w] + 1,
-                func_len,
+                occurences[w],
+                line_end[w] - line_start[w] + 1,
             )
-            for w in word_count.keys()
-        ]
+            for w in occurences.keys()
+        ],
+        length=length,
     )

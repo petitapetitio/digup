@@ -1,11 +1,11 @@
 from textwrap import dedent
 
 from src.format_as_string import as_string
-from src.count_words import WordCounts, WordCount
+from src.count_words import WordCount, Word
 
 
 def test_display_word_count():
-    produced = as_string(WordCounts([WordCount("x", 1, 1, 1)]))
+    produced = as_string(WordCount([Word("x", 1, 1)], 1))
     expected = dedent(
         """\
         ------------------------------------------------------------------------

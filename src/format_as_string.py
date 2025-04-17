@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from src.count_words import WordCounts
+from src.count_words import WordCount
 
 
-def as_string(word_counts: WordCounts) -> str:
+def as_string(word_count: WordCount) -> str:
     columns = {
         "word": _Column("word", 40, "<"),
         "occurences": _Column("#", 10, ">"),
@@ -18,12 +18,12 @@ def as_string(word_counts: WordCounts) -> str:
     res += "-" * array_width + "\n"
     res += header + "\n"
     res += "-" * array_width + "\n"
-    for wc in word_counts._word_counts:
+    for word in word_count._word_counts:
         line = (
-            columns["word"].str_value(wc.word)
-            + columns["occurences"].int_value(wc.occurences)
-            + columns["span"].int_value(wc.span)
-            + columns["proportion"].percentage(wc.span / wc.function_length)
+            columns["word"].str_value(word.word)
+            + columns["occurences"].int_value(word.occurences)
+            + columns["span"].int_value(word.span)
+            + columns["proportion"].percentage(word.span / word_count.length)
         )
         res += line + "\n"
     return res
