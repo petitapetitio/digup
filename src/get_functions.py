@@ -7,10 +7,25 @@ from typing import Optional, Iterable
 @dataclass(frozen=True)
 class Node:
     definition: ast.AST
-    location: str
     source: str
+    filepath: Path
+    class_stack: list[str]
     name: str
     length: int
+
+    @property
+    def location(self) -> str:
+        return self._present_location(self.filepath.name)
+
+    def location_from(self, path: Path) -> str:
+        return self._present_location(str(self.filepath.relative_to(path)))
+
+    def _present_location(self, root: str) -> str:
+        location = "::".join([root, *self.class_stack, self.name])
+        location = location.removesuffix("::")  # hack for the modules
+        return location
+
+
 
 
 class FunctionVisitor(ast.NodeVisitor):
@@ -28,11 +43,10 @@ class FunctionVisitor(ast.NodeVisitor):
         self._class_stack.pop()
 
     def visit_FunctionDef(self, node: ast.FunctionDef):
-        location = "::".join([self._filepath.name, *self._class_stack, node.name])
         if self._search is None or self._search in node.name:
             source = "\n".join(self._sourcefile[node.lineno - 1 : node.end_lineno]) + "\n"
             length = node.end_lineno - node.lineno + 1
-            self._functions.append(Node(node, location, source, node.name, length))
+            self._functions.append(Node(node, source, self._filepath, list(self._class_stack), node.name, length))
 
     @property
     def functions(self) -> list:
@@ -49,12 +63,11 @@ class ClassesVisitor(ast.NodeVisitor):
 
     def visit_ClassDef(self, node: ast.ClassDef):
         self._class_stack.append(node.name)
+        if self._search is None or self._search in node.name:
+            source = "\n".join(self._sourcefile[node.lineno - 1 : node.end_lineno]) + "\n"
+            length = node.end_lineno - node.lineno + 1
+            self._classes.append(Node(node, source, self._filepath, list(self._class_stack), node.name, length))
         self.generic_visit(node)
-        location = "::".join([self._filepath.name, *self._class_stack, node.name])
-        source = "\n".join(self._sourcefile[node.lineno - 1 : node.end_lineno]) + "\n"
-        length = node.end_lineno - node.lineno + 1
-        if self._search is None or self._search in location:
-            self._classes.append(Node(node, location, source, node.name, length))
         self._class_stack.pop()
 
     @property
@@ -71,7 +84,7 @@ def get_modules(paths: list[Path], search: str):
                 source_code = f.read()
                 module = ast.parse(source_code)
                 length = module.body[-1].end_lineno - module.body[0].lineno + 1 if len(module.body) > 0 else 0
-                yield Node(module, str(filepath), source_code, filepath.name, length)
+                yield Node(module, source_code, filepath, [], "", length)
 
     return []
 

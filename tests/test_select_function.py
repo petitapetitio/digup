@@ -21,6 +21,7 @@ def test_selecting_in_a_file_with_several_functions():
     assert len(functions) == 1
     assert functions[0].name == "function_a"
     assert functions[0].location == "file.py::function_a"
+    assert functions[0].location_from(_here) == "test_data/selecting_a_function/one_among_several/file.py::function_a"
 
 
 def test_selecting_in_a_subdirectory():

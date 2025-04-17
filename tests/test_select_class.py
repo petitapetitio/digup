@@ -30,11 +30,9 @@ def test_selecting_a_class_among_two():
 
 
 def test_selecting_in_a_sub_directory():
-    _assert_get_classes_from_path_yields(
-        path=Path("test_data/selecting_class/a_class_in_a_sub_directory"),
-        search="",
-        expected_names=["A"],
-    )
+    path = Path("test_data/selecting_class/a_class_in_a_sub_directory")
+    classes = list(get_classes([_here / path], ""))
+    assert classes[0].name == "A"
 
 
 def test_selecting_when_exist_in_two_files():

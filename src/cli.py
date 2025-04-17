@@ -39,34 +39,56 @@ def main():
         "-s",
         nargs="?",
         default="",
-        help=dedent("""\
+        help=dedent(
+            """\
         keep only nodes that with a location that match the 'search'.
-        Location has form 'directory/subdirectory/file.py::ClassName::method_name'
-        """),
+        Location has form 'file.py::ClassName::method_name'
+        """
+        ),
+    )
+    parser.add_argument(
+        "-f",
+        nargs="?",
+        default=None,
+        const="",
+        help="""\
+        shorthand for `-t functions -s SEARCH`. 
+        It override their values.
+        """,
     )
 
     args, remaining_args = parser.parse_known_args()
     command = args.command
+
     dirs = args.directory
     target = args.target
+    search = args.search
+
+    if args.f is not None:
+        target = "functions"
+        search = args.f
 
     match target:
         case "functions":
-            nodes = get_functions(dirs, args.search)
+            nodes = list(get_functions(dirs, search))
         case "classes":
-            nodes = get_classes(dirs, args.search)
+            nodes = list(get_classes(dirs, search))
         case _:  # "modules"
-            nodes = get_modules(dirs, args.search)
+            nodes = list(get_modules(dirs, search))
 
     print()
     match command:
         case "wc":
             wc_parser = ArgumentParser()
-            wc_parser.add_argument("--aggregate", action="store_true", default=False)
+            aggregate_by_default = target == "modules"
+            wc_parser.add_argument("--aggregate", action="store_true", default=aggregate_by_default)
             wc_args = wc_parser.parse_args(remaining_args)
             if wc_args.aggregate:
                 word_counts = [word_count(n.definition, n.length) for n in nodes]
-                print(f"{len(word_counts)} {target}")
+                print(f"{len(nodes)} {target}")
+                if len(nodes) < 5:
+                    for node in nodes:
+                        print(node.location)
                 print(present_aggregation(Aggregation.of(word_counts)))
             else:
                 for node in nodes:
@@ -82,6 +104,10 @@ def main():
             for node in nodes:
                 print(f"{node.location} ")
                 print(highlight_identifiers(node.source, words, params_only=hi_args.params_only))
+        case "tree":
+            tree = sorted(node.location_from(Path()) for node in nodes)
+            for line in tree:
+                print(line)
 
 
 if __name__ == "__main__":

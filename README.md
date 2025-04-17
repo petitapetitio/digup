@@ -32,9 +32,15 @@ day                                              4        23         35%
 ```
 
 ```bash
+
+digup tree     # display the list of modules
+digup tree -f  # display the list of functions
+
+# aggregate at the codebase level
 digup wc
 
-# aggregate at the function level (all the functions)
+
+# display the word count of all functions
 digup wc -f
 
 # aggregate at the function level (functions that contains my_long_function)
@@ -44,6 +50,7 @@ digup wc -c MyClass
 
 
 digup wc -d tests/test_data/selecting_class/a_class_in_a_sub_directory/
+
 
 ```
 ## Developer documentation
