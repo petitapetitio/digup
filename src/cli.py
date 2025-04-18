@@ -127,7 +127,6 @@ def main():
                 items.sort(key=lambda item: -item.length)
             else:
                 items.sort(key=lambda item: item.name)
-            breakpoint()
             print(present_nodes(items, target))
 
 

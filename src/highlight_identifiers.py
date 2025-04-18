@@ -1,18 +1,21 @@
 import ast
 from collections import defaultdict
 from textwrap import dedent
-from typing import Optional
+from typing import Optional, TypeAlias
 
-from src.colors import LINEAR_COLORS
 from src.count_words import get_identifiers, IdentifierKind
 from src.termcolor import colored
 
+RGBColor: TypeAlias = tuple[int, int, int]
 
-def highlight_identifiers(code: str, only: Optional[set[str]] = None, params_only: bool = False) -> str:
+
+def highlight_identifiers(
+    code: str, colors: list[RGBColor], only: Optional[set[str]] = None, params_only: bool = False
+) -> str:
     # TODO : je parse le code plusieurs fois ici, c'est un peu bête
     source = dedent(code)
     tree = ast.parse(source)
-    colors = iter(LINEAR_COLORS)
+    colors = iter(colors)
     color_by_identifier = {}
     identifiers_by_line: dict[int, list] = defaultdict(list)
     sorted_identifiers = sorted(get_identifiers(tree), key=lambda idtf: (idtf.lineno, idtf.column))

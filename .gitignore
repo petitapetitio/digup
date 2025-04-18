@@ -9,3 +9,10 @@ dist
 *.dtmp
 *.bkp
 
+#
+.ruff_cache
+
+#
+htmlcov
+.coverage
+

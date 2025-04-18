@@ -1,5 +1,6 @@
 from textwrap import dedent
 
+from src.colors import DISTINCT_COLORS
 from src.highlight_identifiers import highlight_identifiers
 
 
@@ -13,7 +14,7 @@ def test_highlighting_identifiers():
     """
     )
 
-    colored = highlight_identifiers(code)
+    colored = highlight_identifiers(code, colors=DISTINCT_COLORS)
 
     assert colored == dedent(
         """
@@ -33,7 +34,7 @@ def test_highlighting_only_some_identifiers():
         c
     """
 
-    colored = highlight_identifiers(code, {"a", "b"})
+    colored = highlight_identifiers(code, colors=DISTINCT_COLORS, only={"a", "b"})
 
     assert colored == dedent(
         """
@@ -53,7 +54,7 @@ def test_highlighting_params_only():
         c = lambda x: x + 1
     """
 
-    colored = highlight_identifiers(code, params_only=True)
+    colored = highlight_identifiers(code, colors=DISTINCT_COLORS, params_only=True)
 
     assert colored == dedent(
         """
@@ -71,7 +72,7 @@ def test_highlighting_classes():
         class B: ...
     """
 
-    colored = highlight_identifiers(code)
+    colored = highlight_identifiers(code, colors=DISTINCT_COLORS)
 
     assert colored == dedent(
         """
@@ -88,7 +89,7 @@ def test_highlighting_a_module():
     class A: ...
     """
 
-    colored = highlight_identifiers(code)
+    colored = highlight_identifiers(code, colors=DISTINCT_COLORS)
 
     assert colored == dedent(
         """
