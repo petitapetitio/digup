@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.get_functions import get_functions
+from src.get_nodes import get_functions
 
 _here = Path(__file__).parent
 

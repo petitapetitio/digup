@@ -3,9 +3,9 @@ from pathlib import Path
 from textwrap import dedent
 
 from src.count_words import word_count
-from src.format_as_string import present_word_count, present_aggregation
+from src.present import present_word_count, present_aggregation
 from src.highlight_identifiers import highlight_identifiers
-from src.get_functions import get_functions, get_classes, get_modules
+from src.get_nodes import get_functions, get_classes, get_modules
 from src.aggregation import Aggregation
 
 USAGE = f"""\

@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from src.format_as_string import present_word_count
+from src.present import present_word_count
 from src.count_words import WordCount, Word
 
 
