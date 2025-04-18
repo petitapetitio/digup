@@ -68,6 +68,22 @@ python -m pip install -r requirements.txt
 python -m pip install -e .
 ```
 
+Run the test:
+```
+pytest
+```
+
+Run the linter:
+```
+ruff check --fix
+```
+
+Format the code:
+```
+black .
+```
+
+
 
 ### How to public a new version
 
