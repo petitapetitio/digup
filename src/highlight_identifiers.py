@@ -10,7 +10,10 @@ RGBColor: TypeAlias = tuple[int, int, int]
 
 
 def highlight_identifiers(
-    code: str, colors: list[RGBColor], only: Optional[set[str]] = None, params_only: bool = False
+    code: str,
+    colors: list[RGBColor],
+    only: Optional[set[str]] = None,
+    params_only: bool = False,
 ) -> str:
     # TODO : je parse le code plusieurs fois ici, c'est un peu bête
     source = dedent(code)

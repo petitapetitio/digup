@@ -33,7 +33,12 @@ def main():
         default=[Path()],
         help="Source file or directory",
     )
-    parser.add_argument("--target", "-t", choices=["functions", "classes", "modules"], default="modules")
+    parser.add_argument(
+        "--target",
+        "-t",
+        choices=["functions", "classes", "modules"],
+        default="modules",
+    )
     parser.add_argument(
         "--search",
         "-s",
@@ -121,12 +126,16 @@ def main():
         case "ls":
             ls_parser = ArgumentParser()
             ls_parser.add_argument("--sort", action="store_true", help="Sort by length")
+            ls_parser.add_argument("-n", type=int, help="Limit to the n first")
             ls_args = ls_parser.parse_args(remaining_args)
             items = [LsItem.from_node(n, Path()) for n in nodes]
+            n = ls_args.n or len(items)
+            items = items[:n]
             if ls_args.sort:
                 items.sort(key=lambda item: -item.length)
             else:
                 items.sort(key=lambda item: item.name)
+            print(f"{n}/{len(nodes)} {target}")
             print(present_nodes(items, target))
 
 
