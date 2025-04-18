@@ -27,12 +27,11 @@ def main():
     )
     parser.add_argument("command")
     parser.add_argument(
-        "--directory",
-        "-d",
         type=Path,
         nargs="*",
+        dest="file_or_dirs",
         default=[Path()],
-        help="Apply only to modules in these directories",
+        help="Source file or directory",
     )
     parser.add_argument("--target", "-t", choices=["functions", "classes", "modules"], default="modules")
     parser.add_argument(
@@ -71,7 +70,7 @@ def main():
     args, remaining_args = parser.parse_known_args()
     command = args.command
 
-    dirs = args.directory
+    dirs = args.file_or_dirs
     target = args.target
     search = args.search
 

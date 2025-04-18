@@ -26,8 +26,6 @@ class Node:
         return location
 
 
-
-
 class FunctionVisitor(ast.NodeVisitor):
     def __init__(self, filepath: Path, search: str, source: str):
         self._class_stack = []
@@ -76,41 +74,47 @@ class ClassesVisitor(ast.NodeVisitor):
 
 
 def get_modules(paths: list[Path], search: str):
-    for path in paths:
-        for filepath in path.glob("**/*.py"):
-            if search not in str(filepath):
-                continue
-            with open(filepath) as f:
-                source_code = f.read()
-                module = ast.parse(source_code)
-                length = module.body[-1].end_lineno - module.body[0].lineno + 1 if len(module.body) > 0 else 0
-                yield Node(module, source_code, filepath, [], "", length)
+    for filepath in _files(paths):
+        if search not in str(filepath):
+            continue
+        with open(filepath) as f:
+            source_code = f.read()
+            module = ast.parse(source_code)
+            length = module.body[-1].end_lineno - module.body[0].lineno + 1 if len(module.body) > 0 else 0
+            yield Node(module, source_code, filepath, [], "", length)
 
     return []
 
 
 def get_classes(paths: list[Path], search: str) -> Iterable[Node]:
-    for folder in paths:
-        for filepath in folder.glob("**/*.py"):
-            with open(filepath) as f:
-                source_code = f.read()
-            module = ast.parse(source_code)
-            visitor = ClassesVisitor(filepath, search, source_code)
-            visitor.visit(module)
-            nodes = visitor.classes
-            yield from nodes
+    for filepath in _files(paths):
+        with open(filepath) as f:
+            source_code = f.read()
+        module = ast.parse(source_code)
+        visitor = ClassesVisitor(filepath, search, source_code)
+        visitor.visit(module)
+        nodes = visitor.classes
+        yield from nodes
 
     return []
 
 
 def get_functions(paths: list[Path], search: str = "") -> Iterable[Node]:
-    for folder in paths:
-        for filepath in folder.glob("**/*.py"):
-            with open(filepath) as f:
-                source = f.read()
-            module = ast.parse(source)
-            visitor = FunctionVisitor(filepath, search, source)
-            visitor.visit(module)
-            yield from visitor.functions
+    for filepath in _files(paths):
+        with open(filepath) as f:
+            source = f.read()
+        module = ast.parse(source)
+        visitor = FunctionVisitor(filepath, search, source)
+        visitor.visit(module)
+        yield from visitor.functions
 
     return []
+
+
+def _files(sources: list[Path]):
+    for source in sources:
+        if source.is_file():
+            yield source
+        elif source.is_dir():
+            for filepath in source.glob("**/*.py"):
+                yield filepath
