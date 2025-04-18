@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
+from pathlib import Path
 
 from src.aggregation import Aggregation
 from src.count_words import WordCount
+from src.get_nodes import Node
 
 
 def present_word_count(word_count: WordCount) -> str:
@@ -12,7 +16,7 @@ def present_word_count(word_count: WordCount) -> str:
         "proportion": _Column("proportion", 12, ">"),
     }
 
-    header = "".join(c.string() for c in columns.values())
+    header = "".join(c.present_header() for c in columns.values())
     array_width = sum(c.width for c in columns.values())
 
     res = ""
@@ -33,12 +37,9 @@ def present_word_count(word_count: WordCount) -> str:
 
 
 def present_aggregation(aggregation: Aggregation):
-    columns = {
-        "word": _Column("word", 40, "<"),
-        "occurences": _Column("occurences", 10, ">")
-    }
+    columns = {"word": _Column("word", 40, "<"), "occurences": _Column("occurences", 10, ">")}
 
-    header = "".join(c.string() for c in columns.values())
+    header = "".join(c.present_header() for c in columns.values())
     array_width = sum(c.width for c in columns.values())
 
     res = ""
@@ -53,12 +54,42 @@ def present_aggregation(aggregation: Aggregation):
 
 
 @dataclass(frozen=True)
+class LsItem:
+    name: str
+    length: int
+
+    @classmethod
+    def from_node(cls, node: Node, from_path: Path) -> LsItem:
+        return LsItem(node.location_from(from_path), node.length)
+
+
+def present_nodes(nodes: list[LsItem], kind: str):
+    columns: dict[str, _Column] = {
+        kind: _Column(kind, 110, "<"),
+        "length": _Column("length", 10, ">"),
+    }
+
+    header = "".join(c.present_header() for c in columns.values())
+    array_width = sum(c.width for c in columns.values())
+
+    res = ""
+    res += "-" * array_width + "\n"
+    res += header + "\n"
+    res += "-" * array_width + "\n"
+
+    for line in nodes:
+        res += columns[kind].str_value(line.name) + columns["length"].int_value(line.length) + "\n"
+
+    return res
+
+
+@dataclass(frozen=True)
 class _Column:
     header: str
     width: int
     indent: str
 
-    def string(self) -> str:
+    def present_header(self) -> str:
         return f"{self.header: {self.indent}{self.width}}"
 
     def str_value(self, value: str) -> str:

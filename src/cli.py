@@ -3,7 +3,7 @@ from pathlib import Path
 from textwrap import dedent
 
 from src.count_words import word_count
-from src.present import present_word_count, present_aggregation
+from src.present import present_word_count, present_aggregation, present_nodes, LsItem
 from src.highlight_identifiers import highlight_identifiers
 from src.get_nodes import get_functions, get_classes, get_modules
 from src.aggregation import Aggregation
@@ -64,7 +64,7 @@ def main():
         help="""\
         Shorthand for `-t classes -s SEARCH`.
         It override their values.
-        """
+        """,
     )
 
     args, remaining_args = parser.parse_known_args()
@@ -119,9 +119,16 @@ def main():
                 print(f"{node.location} ")
                 print(highlight_identifiers(node.source, words, params_only=hi_args.params_only))
         case "ls":
-            tree = sorted(node.location_from(Path()) for node in nodes)
-            for line in tree:
-                print(line)
+            ls_parser = ArgumentParser()
+            ls_parser.add_argument("--sort", action="store_true", help="Sort by length")
+            ls_args = ls_parser.parse_args(remaining_args)
+            items = [LsItem.from_node(n, Path()) for n in nodes]
+            if ls_args.sort:
+                items.sort(key=lambda item: -item.length)
+            else:
+                items.sort(key=lambda item: item.name)
+            breakpoint()
+            print(present_nodes(items, target))
 
 
 if __name__ == "__main__":
