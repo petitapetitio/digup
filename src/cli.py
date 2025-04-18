@@ -16,6 +16,7 @@ A cli-tool that helps you dig up knowledge from Python legacy code.
 Commands:
   hi          Highlight the identifiers in functions
   wc          Count the words in functions
+  ls          List 
 """
 
 
@@ -52,9 +53,19 @@ def main():
         default=None,
         const="",
         help="""\
-        shorthand for `-t functions -s SEARCH`. 
+        Shorthand for `-t functions -s SEARCH`. 
         It override their values.
         """,
+    )
+    parser.add_argument(
+        "-c",
+        nargs="?",
+        default=None,
+        const="",
+        help="""\
+        Shorthand for `-t classes -s SEARCH`.
+        It override their values.
+        """
     )
 
     args, remaining_args = parser.parse_known_args()
@@ -67,6 +78,10 @@ def main():
     if args.f is not None:
         target = "functions"
         search = args.f
+
+    if args.c is not None:
+        target = "classes"
+        search = args.c
 
     match target:
         case "functions":
@@ -104,7 +119,7 @@ def main():
             for node in nodes:
                 print(f"{node.location} ")
                 print(highlight_identifiers(node.source, words, params_only=hi_args.params_only))
-        case "tree":
+        case "ls":
             tree = sorted(node.location_from(Path()) for node in nodes)
             for line in tree:
                 print(line)

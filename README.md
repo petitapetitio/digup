@@ -36,14 +36,14 @@ day                                              4        23         35%
 digup tree     # display the list of modules
 digup tree -f  # display the list of functions
 
-# aggregate at the codebase level
+# the codebase wordcount
 digup wc
 
-
-# display the word count of all functions
+# the word count of all functions
 digup wc -f
 
-# aggregate at the function level (functions that contains my_long_function)
+# the word count of the function my_long_function
+# (to be precise, all the functions that contains my_long_function)
 digup wc -f my_long_function
 
 digup wc -c MyClass
