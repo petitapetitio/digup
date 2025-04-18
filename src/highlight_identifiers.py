@@ -1,45 +1,18 @@
 import ast
 from collections import defaultdict
 from textwrap import dedent
-from typing import cast, Optional
+from typing import Optional
 
+from src.colors import LINEAR_COLORS
 from src.count_words import get_identifiers, IdentifierKind
 from src.termcolor import colored
-
-
-DISTINCT_RGB_COLORS = [
-    (0, 130, 200),  # Blue
-    (60, 180, 75),  # Green
-    (230, 25, 75),  # Red
-    (245, 130, 48),  # Orange
-    (145, 30, 180),  # Purple
-    (70, 240, 240),  # Cyan
-    (240, 50, 230),  # Magenta
-    (210, 245, 60),  # Lime
-    (250, 190, 190),  # Pink
-    (0, 128, 128),  # Teal
-    (230, 190, 255),  # Lavender
-    (170, 110, 40),  # Brown
-    (255, 250, 200),  # Light Yellow
-    (128, 0, 0),  # Maroon
-    (170, 255, 195),  # Mint
-    (128, 128, 0),  # Olive
-    (255, 215, 180),  # Apricot
-    (0, 0, 128),  # Navy
-    (128, 128, 128),  # Grey
-    (255, 255, 255),  # White
-    (0, 0, 0),  # Black
-    (255, 255, 0),  # Yellow
-    (255, 153, 204),  # Bubblegum
-    (102, 51, 153),  # Deep Purple
-] + [(125, 125, 125)] * 1000
 
 
 def highlight_identifiers(code: str, only: Optional[set[str]] = None, params_only: bool = False) -> str:
     # TODO : je parse le code plusieurs fois ici, c'est un peu bête
     source = dedent(code)
     tree = ast.parse(source)
-    colors = iter(DISTINCT_RGB_COLORS)
+    colors = iter(LINEAR_COLORS)
     color_by_identifier = {}
     identifiers_by_line: dict[int, list] = defaultdict(list)
     sorted_identifiers = sorted(get_identifiers(tree), key=lambda idtf: (idtf.lineno, idtf.column))
