@@ -8,7 +8,7 @@ from src.highlight_identifiers import highlight_identifiers
 from src.get_nodes import get_functions, get_classes, get_modules
 from src.aggregation import Aggregation
 
-USAGE = f"""\
+USAGE = """\
 %(prog)s COMMAND [options]
 
 A cli-tool that helps you dig up knowledge from Python legacy code.

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass
-from enum import Enum, StrEnum
+from enum import StrEnum
 from typing import Iterable
 
 
