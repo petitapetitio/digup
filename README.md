@@ -50,9 +50,8 @@ digup wc -c MyClass
 
 
 digup wc -d tests/test_data/selecting_class/a_class_in_a_sub_directory/
-
-
 ```
+
 ## Developer documentation
 
 ### How to install the project
