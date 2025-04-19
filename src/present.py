@@ -104,12 +104,3 @@ class _Column:
 
     def present_value(self, value: object):
         return f"{value: {self.align}{self.width}{self.precision}{self.type}}"
-
-    def str_value(self, value: str) -> str:
-        return f"{value: {self.align}{self.width}}"
-
-    def int_value(self, value: int) -> str:
-        return f"{value: {self.align}{self.width}}"
-
-    def percentage(self, normalized_percentage: float) -> str:
-        return f"{normalized_percentage: {self.align}{self.width}.0%}"
