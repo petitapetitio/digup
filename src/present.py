@@ -13,16 +13,13 @@ TableItem = TypeVar("TableItem")
 
 @dataclass(frozen=True)
 class Table:
-    columns: dict[str, _Column]
+    columns: list[_Column]
     table_width: int
 
     @classmethod
     def of(cls, columns: list[_Column]) -> Table:
-        index = {}
-        for c in columns:
-            index[c.name] = c
-        table_width = sum(c.width for c in index.values())
-        return Table(index, table_width)
+        table_width = sum(c.width for c in columns)
+        return Table(columns, table_width)
 
     def present(self, words, param) -> str:
         res = ""
@@ -33,7 +30,7 @@ class Table:
         return res
 
     def _header(self) -> str:
-        return "".join(c.present_header() for c in self.columns.values()) + "\n"
+        return "".join(c.present_header() for c in self.columns) + "\n"
 
     def _separator(self) -> str:
         return "-" * self.table_width + "\n"
@@ -41,7 +38,7 @@ class Table:
     def _body(self, item: Iterable[TableItem], item_to_tuple: Callable[[TableItem], tuple]):
         res = ""
         for word in item:
-            line = "".join([c.present_value(v) for c, v in zip(self.columns.values(), item_to_tuple(word))])
+            line = "".join([c.present_value(v) for c, v in zip(self.columns, item_to_tuple(word))])
             res += line + "\n"
         return res
 
