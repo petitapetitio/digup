@@ -2,44 +2,27 @@ from argparse import ArgumentParser
 from pathlib import Path
 from textwrap import dedent
 
-from src.count_words import word_count
-from src.present import present_word_count, present_aggregation, present_nodes, LsItem
-from src.highlight_identifiers import highlight_identifiers
-from src.get_nodes import get_functions, get_classes, get_modules
-from src.aggregation import Aggregation
-
-USAGE = """\
-%(prog)s COMMAND [options]
-
-A cli-tool that helps you dig up knowledge from Python legacy code.
-
-Commands:
-  hi          Highlight the identifiers in functions
-  wc          Count the words in functions
-  ls          List 
-"""
+from src.commands import run_wc, run_hi, run_ls
 
 
 def main():
-    parser = ArgumentParser(
-        usage=USAGE,
-        add_help=True,
-    )
-    parser.add_argument("command")
-    parser.add_argument(
+    parser = ArgumentParser(add_help=True)
+
+    common_args_parser = ArgumentParser(add_help=False)
+    common_args_parser.add_argument(
         type=Path,
         nargs="*",
         dest="file_or_dirs",
         default=[Path()],
         help="Source file or directory",
     )
-    parser.add_argument(
+    common_args_parser.add_argument(
         "--target",
         "-t",
-        choices=["functions", "classes", "modules"],
+        choices=["function", "class", "module"],
         default="modules",
     )
-    parser.add_argument(
+    common_args_parser.add_argument(
         "--search",
         "-s",
         nargs="?",
@@ -51,92 +34,64 @@ def main():
         """
         ),
     )
-    parser.add_argument(
+    shorthands = common_args_parser.add_mutually_exclusive_group()
+    shorthands.add_argument(
+        "--function",
         "-f",
         nargs="?",
         default=None,
         const="",
         help="""\
-        Shorthand for `-t functions -s SEARCH`. 
+        Shorthand for `-t function -s SEARCH`. 
         It override their values.
         """,
     )
-    parser.add_argument(
+    shorthands.add_argument(
+        "--class",
         "-c",
         nargs="?",
         default=None,
         const="",
         help="""\
-        Shorthand for `-t classes -s SEARCH`.
+        Shorthand for `-t classe -s SEARCH`.
         It override their values.
         """,
     )
 
-    args, remaining_args = parser.parse_known_args()
-    command = args.command
+    subparsers = parser.add_subparsers()
 
-    dirs = args.file_or_dirs
-    target = args.target
-    search = args.search
+    wc_parser = subparsers.add_parser("wc", parents=[common_args_parser], help="Count the words in functions")
+    wc_parser.add_argument("--aggregate", action="store_true")
+    wc_parser.set_defaults(command_handler=run_wc)
 
-    if args.f is not None:
-        target = "functions"
-        search = args.f
+    hi_parser = subparsers.add_parser("hi", parents=[common_args_parser], help="Highlight the identifiers in functions")
+    hi_parser.add_argument("--word", "-w", type=str, nargs="*", default=None)
+    hi_parser.add_argument("--params-only", "-p", action="store_true", default=False)
+    hi_parser.set_defaults(command_handler=run_hi)
 
-    if args.c is not None:
-        target = "classes"
-        search = args.c
+    ls_parser = subparsers.add_parser("ls", parents=[common_args_parser], help="List the items")
+    ls_parser.add_argument("--sort", action="store_true", help="Sort by length")
+    ls_parser.add_argument("-n", type=int, help="Limit to the n first")
+    ls_parser.set_defaults(command_handler=run_ls)
 
-    match target:
-        case "functions":
-            nodes = list(get_functions(dirs, search))
-        case "classes":
-            nodes = list(get_classes(dirs, search))
-        case _:  # "modules"
-            nodes = list(get_modules(dirs, search))
+    args = parser.parse_args()
 
-    print()
-    match command:
-        case "wc":
-            wc_parser = ArgumentParser()
-            aggregate_by_default = target == "modules"
-            wc_parser.add_argument("--aggregate", action="store_true", default=aggregate_by_default)
-            wc_args = wc_parser.parse_args(remaining_args)
-            if wc_args.aggregate:
-                word_counts = [word_count(n.definition, n.length) for n in nodes]
-                print(f"{len(nodes)} {target}")
-                if len(nodes) < 5:
-                    for node in nodes:
-                        print(node.location)
-                print(present_aggregation(Aggregation.of(word_counts)))
-            else:
-                for node in nodes:
-                    print(f"{node.location}")
-                    print(present_word_count(word_count(node.definition, node.length).sorted_by_occurences()))
-        case "hi":
-            hi_parser = ArgumentParser()
-            hi_parser.add_argument("--word", "-w", type=str, nargs="*", default=None)
-            hi_parser.add_argument("--params-only", "-p", action="store_true", default=False)
-            hi_args = hi_parser.parse_args(remaining_args)
-            words = set(hi_args.word) if hi_args.word is not None else None
+    # Handle -f shorthand
+    if args.function is not None:
+        args.target = "functions"
+        args.search = args.f
 
-            for node in nodes:
-                print(f"{node.location} ")
-                print(highlight_identifiers(node.source, words, params_only=hi_args.params_only))
-        case "ls":
-            ls_parser = ArgumentParser()
-            ls_parser.add_argument("--sort", action="store_true", help="Sort by length")
-            ls_parser.add_argument("-n", type=int, help="Limit to the n first")
-            ls_args = ls_parser.parse_args(remaining_args)
-            items = [LsItem.from_node(n, Path()) for n in nodes]
-            n = ls_args.n or len(items)
-            items = items[:n]
-            if ls_args.sort:
-                items.sort(key=lambda item: -item.length)
-            else:
-                items.sort(key=lambda item: item.name)
-            print(f"{n}/{len(nodes)} {target}")
-            print(present_nodes(items, target))
+    # Handle -c shorthand
+    if getattr(args, "class") is not None:
+        args.target = "classes"
+        args.search = args.c
+
+    # Call the command
+    command_handler = args.command_handler
+    delattr(args, "class")
+    delattr(args, "function")
+    delattr(args, "command_handler")
+    command_handler(args)
 
 
 if __name__ == "__main__":
