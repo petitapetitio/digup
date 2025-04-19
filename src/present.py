@@ -21,12 +21,12 @@ class Table:
         table_width = sum(c.width for c in columns)
         return Table(columns, table_width)
 
-    def present(self, words, param) -> str:
+    def present(self, items: Iterable[TableItem], item_to_tuple: Callable[[TableItem], Iterable]) -> str:
         res = ""
         res += self._separator()
         res += self._header()
         res += self._separator()
-        res += self._body(words, param)
+        res += self._body(items, item_to_tuple)
         return res
 
     def _header(self) -> str:
@@ -35,9 +35,9 @@ class Table:
     def _separator(self) -> str:
         return "-" * self.table_width + "\n"
 
-    def _body(self, item: Iterable[TableItem], item_to_tuple: Callable[[TableItem], tuple]):
+    def _body(self, items: Iterable[TableItem], item_to_tuple: Callable[[TableItem], Iterable]):
         res = ""
-        for word in item:
+        for word in items:
             line = "".join([c.present_value(v) for c, v in zip(self.columns, item_to_tuple(word))])
             res += line + "\n"
         return res
@@ -53,25 +53,20 @@ def present_word_count(word_count: WordCount) -> str:
         ]
     ).present(
         word_count.words,
-        lambda w: (w.word, w.occurences, w.span, w.span / word_count.length),
+        lambda word: (word.word, word.occurences, word.span, word.span / word_count.length),
     )
 
 
 def present_aggregation(aggregation: Aggregation):
-    columns = {"word": _Column("word", 40, "<"), "occurences": _Column("occurences", 10, ">")}
-
-    header = "".join(c.present_header() for c in columns.values())
-    array_width = sum(c.width for c in columns.values())
-
-    res = ""
-    res += "-" * array_width + "\n"
-    res += header + "\n"
-    res += "-" * array_width + "\n"
-
-    for word, count in aggregation.counts():
-        res += columns["word"].str_value(word) + columns["occurences"].int_value(count) + "\n"
-
-    return res
+    return Table.of(
+        [
+            _Column("word", 40, "<"),
+            _Column("occurences", 10, ">"),
+        ]
+    ).present(
+        aggregation.counts(),
+        lambda a: a,
+    )
 
 
 @dataclass(frozen=True)
@@ -84,24 +79,16 @@ class LsItem:
         return LsItem(node.location_from(from_path), node.length)
 
 
-def present_nodes(nodes: list[LsItem], kind: str):
-    columns: dict[str, _Column] = {
-        kind: _Column(kind, 110, "<"),
-        "length": _Column("length", 10, ">"),
-    }
-
-    header = "".join(c.present_header() for c in columns.values())
-    array_width = sum(c.width for c in columns.values())
-
-    res = ""
-    res += "-" * array_width + "\n"
-    res += header + "\n"
-    res += "-" * array_width + "\n"
-
-    for line in nodes:
-        res += columns[kind].str_value(line.name) + columns["length"].int_value(line.length) + "\n"
-
-    return res
+def present_nodes(ls_items: list[LsItem], kind: str):
+    return Table.of(
+        [
+            _Column(kind, 110, "<"),
+            _Column("length", 10, ">"),
+        ]
+    ).present(
+        ls_items,
+        lambda ls_item: (ls_item.name, ls_item.length),
+    )
 
 
 @dataclass(frozen=True)
