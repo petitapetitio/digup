@@ -1,6 +1,6 @@
 [project]
 name = "digup"
-version = "0.0.4"
+version = "0.0.5"
 authors = [{name="Alexandre Petit"}]
 description = "Your cli buddy to dig up knowledge from legacy code"
 readme = "README.md"
