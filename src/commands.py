@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from src.colors import LINEAR_COLORS
 from src.count_words import word_count
 from src.present import present_word_count, present_aggregation, present_nodes, LsItem
 from src.highlight_identifiers import highlight_identifiers
@@ -32,7 +31,7 @@ def run_hi(args):
 
     for node in nodes:
         print(f"{node.location} ")
-        print(highlight_identifiers(node.source, LINEAR_COLORS, words, params_only=args.params_only))
+        print(highlight_identifiers(node.source, only=words, params_only=args.params_only))
 
 
 def run_ls(args):
