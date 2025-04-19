@@ -40,11 +40,11 @@ def run_ls(args):
     nodes = _get_nodes(args.file_or_dirs, args.search, args.target)
     items = [LsItem.from_node(n, Path()) for n in nodes]
     n = args.n or len(items)
-    items = items[:n]
     if args.sort:
         items.sort(key=lambda item: -item.length)
     else:
         items.sort(key=lambda item: item.name)
+    items = items[:n]
     print(f"{n}/{len(nodes)} {args.target}")
     print(present_nodes(items, args.target))
 

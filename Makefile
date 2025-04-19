@@ -12,8 +12,12 @@ coverage:
 check: format test
 
 clean:
-	rm .coverage
+	rm -f .coverage
 	rm -rf .pytest_cache
 	rm -rf .ruff_cache
 	rm -rf htmlcov
-	rm dist/*
+	rm -f dist/*
+
+release: clean
+	python -m build
+	python -m twine upload dist/*

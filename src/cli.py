@@ -79,12 +79,12 @@ def main():
     # Handle -f shorthand
     if args.function is not None:
         args.target = "functions"
-        args.search = args.f
+        args.search = args.function
 
     # Handle -c shorthand
     if getattr(args, "class") is not None:
         args.target = "classes"
-        args.search = args.c
+        args.search = getattr(args, "class")
 
     # Call the command
     command_handler = args.command_handler
