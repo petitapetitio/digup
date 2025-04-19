@@ -3,6 +3,7 @@ from textwrap import dedent
 from typing import cast
 
 from src.count_words import word_count, WordCount, Word
+from src.get_nodes import node_length
 
 
 def test_1():
@@ -93,5 +94,5 @@ def test_a_complex_case():
 def _wc(source: str) -> WordCount:
     tree = ast.parse(dedent(source))
     function = cast(ast.FunctionDef, tree.body[0])
-    length = function.end_lineno - function.lineno + 1
+    length = node_length(function.lineno, function.end_lineno)
     return word_count(function, length)

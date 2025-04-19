@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TypeVar, Iterable, Callable
 
 from src.aggregation import Aggregation
 from src.count_words import WordCount
 from src.get_nodes import Node
+
+TableItem = TypeVar("TableItem")
 
 
 @dataclass(frozen=True)
@@ -21,43 +24,40 @@ class Table:
         table_width = sum(c.width for c in index.values())
         return Table(index, table_width)
 
-    def header(self) -> str:
+    def present(self, words, param) -> str:
+        res = ""
+        res += self._separator()
+        res += self._header()
+        res += self._separator()
+        res += self._body(words, param)
+        return res
+
+    def _header(self) -> str:
         return "".join(c.present_header() for c in self.columns.values()) + "\n"
 
-    def separator(self) -> str:
+    def _separator(self) -> str:
         return "-" * self.table_width + "\n"
+
+    def _body(self, item: Iterable[TableItem], item_to_tuple: Callable[[TableItem], tuple]):
+        res = ""
+        for word in item:
+            line = "".join([c.present_value(v) for c, v in zip(self.columns.values(), item_to_tuple(word))])
+            res += line + "\n"
+        return res
 
 
 def present_word_count(word_count: WordCount) -> str:
-    table = Table.of([
-        _Column("word", 40, "<"),
-        _Column("#", 10, ">"),
-        _Column("span", 10, ">"),
-        _Column("proportion", 12, ">"),
-    ])
-
-    columns = {
-        "word": _Column("word", 40, "<"),
-        "occurences": _Column("#", 10, ">"),
-        "span": _Column("span", 10, ">"),
-        "proportion": _Column("proportion", 12, ">"),
-    }
-
-    res = ""
-    res += table.separator()
-    res += table.header()
-    res += table.separator()
-
-    for word in word_count.words:
-        line = (
-            columns["word"].str_value(word.word)
-            + columns["occurences"].int_value(word.occurences)
-            + columns["span"].int_value(word.span)
-            + columns["proportion"].percentage(word.span / word_count.length)
-        )
-        res += line + "\n"
-
-    return res
+    return Table.of(
+        [
+            _Column("word", 40, "<"),
+            _Column("#", 10, ">"),
+            _Column("span", 10, ">"),
+            _Column("proportion", 12, ">", precision=".0", type="%"),
+        ]
+    ).present(
+        word_count.words,
+        lambda w: (w.word, w.occurences, w.span, w.span / word_count.length),
+    )
 
 
 def present_aggregation(aggregation: Aggregation):
@@ -112,9 +112,14 @@ class _Column:
     name: str
     width: int
     align: str
+    precision: str = ""
+    type: str = ""
 
     def present_header(self) -> str:
         return f"{self.name: {self.align}{self.width}}"
+
+    def present_value(self, value: object):
+        return f"{value: {self.align}{self.width}{self.precision}{self.type}}"
 
     def str_value(self, value: str) -> str:
         return f"{value: {self.align}{self.width}}"

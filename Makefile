@@ -3,6 +3,7 @@ format:
 	black .
 
 test:
+	mypy .
 	pytest
 
 coverage:

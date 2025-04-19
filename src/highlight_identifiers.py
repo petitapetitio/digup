@@ -18,7 +18,7 @@ def highlight_identifiers(
     # TODO : je parse le code plusieurs fois ici, c'est un peu bête
     source = dedent(code)
     tree = ast.parse(source)
-    colors = iter(colors)
+    colors_iterator = iter(colors)
     color_by_identifier = {}
     identifiers_by_line: dict[int, list] = defaultdict(list)
     sorted_identifiers = sorted(get_identifiers(tree), key=lambda idtf: (idtf.lineno, idtf.column))
@@ -29,7 +29,7 @@ def highlight_identifiers(
             continue
 
         if identifier.name not in color_by_identifier:
-            color = next(colors)
+            color = next(colors_iterator)
             color_by_identifier[identifier.name] = color
         identifiers_by_line[identifier.lineno].append(identifier)
     highlighted_lines = []

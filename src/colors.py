@@ -27,8 +27,8 @@ def _hsv_to_rgb(h: float, s: float, v: float, a: float) -> tuple:
         return w, q, v, a
     if i == 4:
         return t, w, v, a
-    if i == 5:
-        return v, w, q, a
+    #  i == 5:
+    return v, w, q, a
 
 
 _gradient_length = 24

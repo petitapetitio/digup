@@ -3,6 +3,7 @@ from textwrap import dedent
 from typing import cast
 
 from src.count_words import WordCount, Word, word_count
+from src.get_nodes import node_length
 
 
 def test_empty_class():
@@ -61,4 +62,4 @@ def test_a_class_with_methods():
 def _wc(code: str) -> WordCount:
     tree = ast.parse(dedent(code))
     class_node = cast(ast.ClassDef, tree.body[0])
-    return word_count(class_node, class_node.end_lineno - class_node.lineno + 1)
+    return word_count(class_node, node_length(class_node.lineno, class_node.end_lineno))

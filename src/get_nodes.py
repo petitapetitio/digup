@@ -28,12 +28,11 @@ class Node:
 
 class FunctionVisitor(ast.NodeVisitor):
     def __init__(self, filepath: Path, search: str, source: str):
-        self._class_stack = []
+        self._class_stack: list[str] = []
         self._filepath = filepath
         self._sourcefile = source.splitlines()
         self._search = search
-        self._functions = []
-        self._classes = []
+        self._functions: list[Node] = []
 
     def visit_ClassDef(self, node: ast.ClassDef):
         self._class_stack.append(node.name)
@@ -43,8 +42,16 @@ class FunctionVisitor(ast.NodeVisitor):
     def visit_FunctionDef(self, node: ast.FunctionDef):
         if self._search is None or self._search in node.name:
             source = "\n".join(self._sourcefile[node.lineno - 1 : node.end_lineno]) + "\n"
-            length = node.end_lineno - node.lineno + 1
-            self._functions.append(Node(node, source, self._filepath, list(self._class_stack), node.name, length))
+            self._functions.append(
+                Node(
+                    node,
+                    source,
+                    self._filepath,
+                    list(self._class_stack),
+                    node.name,
+                    node_length(node.lineno, node.end_lineno),
+                )
+            )
 
     @property
     def functions(self) -> list:
@@ -53,24 +60,39 @@ class FunctionVisitor(ast.NodeVisitor):
 
 class ClassesVisitor(ast.NodeVisitor):
     def __init__(self, filepath: Path, search: Optional[str], source: str):
-        self._class_stack = []
+        self._class_stack: list[str] = []
         self._filepath = filepath
         self._sourcefile = source.splitlines()
         self._search = search
-        self._classes = []
+        self._classes: list[Node] = []
 
     def visit_ClassDef(self, node: ast.ClassDef):
         self._class_stack.append(node.name)
         if self._search is None or self._search in node.name:
             source = "\n".join(self._sourcefile[node.lineno - 1 : node.end_lineno]) + "\n"
-            length = node.end_lineno - node.lineno + 1
-            self._classes.append(Node(node, source, self._filepath, list(self._class_stack), node.name, length))
+            self._classes.append(
+                Node(
+                    node,
+                    source,
+                    self._filepath,
+                    list(self._class_stack),
+                    node.name,
+                    node_length(node.lineno, node.end_lineno),
+                )
+            )
         self.generic_visit(node)
         self._class_stack.pop()
 
     @property
     def classes(self) -> list[Node]:
         return self._classes
+
+
+def node_length(lineno: int, end_lineno: int | None) -> int:
+    if end_lineno is None:
+        return -1
+
+    return end_lineno - lineno + 1
 
 
 def get_modules(paths: list[Path], search: str):
@@ -80,7 +102,7 @@ def get_modules(paths: list[Path], search: str):
         with open(filepath) as f:
             source_code = f.read()
             module = ast.parse(source_code)
-            length = module.body[-1].end_lineno - module.body[0].lineno + 1 if len(module.body) > 0 else 0
+            length = node_length(module.body[0].lineno, module.body[-1].end_lineno) if len(module.body) > 0 else 0
             yield Node(module, source_code, filepath, [], "", length)
 
     return []
@@ -96,8 +118,6 @@ def get_classes(paths: list[Path], search: str) -> Iterable[Node]:
         nodes = visitor.classes
         yield from nodes
 
-    return []
-
 
 def get_functions(paths: list[Path], search: str = "") -> Iterable[Node]:
     for filepath in _files(paths):
@@ -107,8 +127,6 @@ def get_functions(paths: list[Path], search: str = "") -> Iterable[Node]:
         visitor = FunctionVisitor(filepath, search, source)
         visitor.visit(module)
         yield from visitor.functions
-
-    return []
 
 
 def _files(sources: list[Path]):

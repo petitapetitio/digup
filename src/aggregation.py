@@ -13,7 +13,7 @@ class Aggregation:
 
     @classmethod
     def of(cls, statement_word_counts: list[WordCount]) -> Aggregation:
-        total = defaultdict(lambda: 0)
+        total: dict[str, int] = defaultdict(lambda: 0)
         for word_counts in statement_word_counts:
             for word_count in word_counts.words:
                 total[word_count.word] += word_count.occurences
