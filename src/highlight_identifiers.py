@@ -6,6 +6,7 @@ from typing import Optional
 
 from src.colorize import hue_gradient, colorize
 from src.count_words import get_identifiers, IdentifierKind
+from src.limits import Limit, NoLimit
 
 
 @dataclass(frozen=True)
@@ -21,6 +22,7 @@ def highlight_identifiers(
     colors: Optional[list[int]] = None,
     only: Optional[set[str]] = None,
     params_only: bool = False,
+    limit: Limit = NoLimit(),
 ) -> dict[int, list[IdentifierToHighlight]]:
     # TODO : je parse le code plusieurs fois ici, c'est un peu bête
     source = dedent(code)
@@ -43,12 +45,14 @@ def highlight_identifiers(
             if identifier.name in only:
                 filtered_identifiers.append(identifier)
 
-    names = {i.name: i for i in filtered_identifiers}
+    ordered_names = {n: n for n in limit.limit(i.name for i in filtered_identifiers)}.keys()
+
+    filtered_identifiers = [i for i in filtered_identifiers if i.name in ordered_names]
 
     if colors is None:
-        colors = hue_gradient(len(names))
+        colors = hue_gradient(len(ordered_names))
 
-    colors_by_name = {name: color for name, color in zip(names.keys(), colors)}
+    colors_by_name = {name: color for name, color in zip(ordered_names, colors)}
 
     identifiers_by_line: dict[int, list[IdentifierToHighlight]] = defaultdict(list)
     for identifier in filtered_identifiers:

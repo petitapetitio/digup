@@ -1,9 +1,10 @@
 from textwrap import dedent
 
 from src.highlight_identifiers import highlight_identifiers, IdentifierToHighlight
+from src.limits import FirstN
 
 
-def test_highlighting_identifiers():
+def test_highlighting_identifiers_simple():
     code = dedent(
         """
     def f():
@@ -60,6 +61,16 @@ def test_highlighting_params_only():
             IdentifierToHighlight(name="x", column=15, color=3),
             IdentifierToHighlight(name="x", column=18, color=3),
         ],
+    }
+
+
+def test_highlight_first_n():
+    code = "def f(a, b, c, d): ..."
+
+    colored = highlight_identifiers(code, limit=FirstN(2), colors=[1, 2])
+
+    assert colored == {
+        1: [IdentifierToHighlight(name="f", column=4, color=1), IdentifierToHighlight(name="a", column=6, color=2)]
     }
 
 
