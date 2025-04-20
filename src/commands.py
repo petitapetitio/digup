@@ -1,8 +1,9 @@
 from pathlib import Path
 
 from src.count_words import word_count
+from src.limits import LeastN, MostN, FirstN, LastN, NoLimit
 from src.present import present_word_count, present_aggregation, present_nodes, LsItem
-from src.highlight_identifiers import highlight_identifiers
+from src.highlight_identifiers import highlight_identifiers, present_highlights
 from src.get_nodes import get_functions, get_classes, get_modules, Node
 from src.aggregation import Aggregation
 
@@ -28,10 +29,29 @@ def run_hi(args):
     # TODO : assert with a typeddict
     nodes = _get_nodes(args.file_or_dirs, args.search, args.target)
     words = set(args.word) if args.word is not None else None
+    limit = _get_limit(args)
 
     for node in nodes:
         print(f"{node.location} ")
-        print(highlight_identifiers(node.source, only=words, params_only=args.params_only))
+        print(
+            present_highlights(
+                highlight_identifiers(node.source, limit=limit, only=words, params_only=args.params_only), node.source
+            )
+        )
+
+
+def _get_limit(args):
+    if args.least:
+        limit = LeastN(args.least)
+    elif args.most:
+        limit = MostN(args.most)
+    elif args.first:
+        limit = FirstN(args.first)
+    elif args.last:
+        limit = LastN(args.last)
+    else:
+        limit = NoLimit()
+    return limit
 
 
 def run_ls(args):

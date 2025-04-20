@@ -67,6 +67,11 @@ def main():
     hi_parser = subparsers.add_parser("hi", parents=[common_args_parser], help="Highlight the identifiers in functions")
     hi_parser.add_argument("--word", "-w", type=str, nargs="*", default=None)
     hi_parser.add_argument("--params-only", "-p", action="store_true", default=False)
+    hi_limits = hi_parser.add_mutually_exclusive_group()
+    hi_limits.add_argument("--least", type=int, help="Highlight only the n least common identifiers")
+    hi_limits.add_argument("--most", type=int, help="Highlight only the n most common identifiers")
+    hi_limits.add_argument("--first", type=int, help="Highlight only the n first identifiers")
+    hi_limits.add_argument("--last", type=int, help="Highlight only the n last identifiers")
     hi_parser.set_defaults(command_handler=run_hi)
 
     ls_parser = subparsers.add_parser("ls", parents=[common_args_parser], help="List the items")
