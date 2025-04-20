@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from src.highlight_identifiers import highlight_identifiers, IdentifierToHighlight
+from src.highlight import highlight_identifiers, IdentifierToHighlight
 from src.limits import FirstN
 
 
