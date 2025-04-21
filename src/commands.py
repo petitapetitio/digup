@@ -12,17 +12,20 @@ def run_wc(args):
     # TODO : assert with a typeddict
     nodes = _get_nodes(args.file_or_dirs, args.search, args.target)
     aggregate = args.aggregate or (args.target == "modules")
+    limit_to = args.n or 1_000_000_000
     if aggregate:
         word_counts = [word_count(n.definition, n.length) for n in nodes]
         print(f"{len(nodes)} {args.target}")
         if len(nodes) < 5:
             for node in nodes:
                 print(node.location)
-        print(present_aggregation(Aggregation.of(word_counts)))
+        print(present_aggregation(Aggregation.of(word_counts), limit_to=limit_to))
     else:
         for node in nodes:
             print(f"{node.location}")
-            print(present_word_count(word_count(node.definition, node.length).sorted_by_occurences()))
+            print(
+                present_word_count(word_count(node.definition, node.length).sorted_by_occurences().limit_to(limit_to))
+            )
 
 
 def run_hi(args):

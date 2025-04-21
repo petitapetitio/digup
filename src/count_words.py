@@ -21,6 +21,9 @@ class WordCount:
     def sorted_by_occurences(self) -> WordCount:
         return WordCount(sorted(self.words, key=lambda wc: wc.occurences, reverse=True), self.length)
 
+    def limit_to(self, n: int) -> WordCount:
+        return WordCount(self.words[:n], self.length)
+
 
 class IdentifierKind(StrEnum):
     ARG = "arg"

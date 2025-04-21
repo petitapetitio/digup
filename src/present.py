@@ -57,14 +57,14 @@ def present_word_count(word_count: WordCount) -> str:
     )
 
 
-def present_aggregation(aggregation: Aggregation):
+def present_aggregation(aggregation: Aggregation, limit_to: int):
     return Table.of(
         [
             _Column("word", 40, "<"),
             _Column("occurences", 10, ">"),
         ]
     ).present(
-        aggregation.counts(),
+        list(aggregation.counts())[:limit_to],
         lambda a: a,
     )
 

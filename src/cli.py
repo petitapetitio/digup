@@ -62,6 +62,7 @@ def main():
 
     wc_parser = subparsers.add_parser("wc", parents=[common_args_parser], help="Count the words in functions")
     wc_parser.add_argument("--aggregate", action="store_true")
+    wc_parser.add_argument("-n", type=int, help="Limit to the n first")
     wc_parser.set_defaults(command_handler=run_wc)
 
     hi_parser = subparsers.add_parser("hi", parents=[common_args_parser], help="Highlight the identifiers in functions")
