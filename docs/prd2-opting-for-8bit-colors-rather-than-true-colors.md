@@ -1,4 +1,5 @@
 
+
 Détecter le mode dispo : 
 - 256 ?
 - True color ? 
