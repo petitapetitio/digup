@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.get_nodes import get_classes
+from digup.get_nodes import get_classes
 
 _here = Path(__file__).parent
 

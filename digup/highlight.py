@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from textwrap import dedent
 from typing import Optional
 
-from src.colorize import hue_gradient, colorize
-from src.count_words import get_identifiers, IdentifierKind
-from src.limits import Limit, NoLimit
+from digup.colorize import hue_gradient, colorize
+from digup.count_words import get_identifiers, IdentifierKind
+from digup.limits import Limit, NoLimit
 
 
 @dataclass(frozen=True)

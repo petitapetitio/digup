@@ -1,6 +1,6 @@
 [project]
 name = "digup"
-version = "0.0.7"
+version = "0.0.8"
 authors = [{name="Alexandre Petit"}]
 description = "Your cli buddy to dig up knowledge from legacy code"
 readme = "README.md"
@@ -13,14 +13,14 @@ license = "MIT"
 license-files = ["LICENSE*"]
 
 [project.scripts]
-digup = "src.cli:main"
+digup = "digup.cli:main"
 
 [build-system]
 requires = ["hatchling >= 1.27"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
+packages = ["digup"]
 
 
 [tool.black]

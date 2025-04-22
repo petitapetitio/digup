@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from src.aggregation import Aggregation
-from src.count_words import Word, WordCount
+from digup.aggregation import Aggregation
+from digup.count_words import Word, WordCount
 
 
 def test_sum_a_single_wordcounts():

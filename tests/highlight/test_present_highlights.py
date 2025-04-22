@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from src.highlight import present_highlights, IdentifierToHighlight
+from digup.highlight import present_highlights, IdentifierToHighlight
 
 
 def test_present_highlights():

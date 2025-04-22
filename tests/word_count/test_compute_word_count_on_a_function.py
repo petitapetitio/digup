@@ -2,8 +2,8 @@ import ast
 from textwrap import dedent
 from typing import cast
 
-from src.count_words import word_count, WordCount, Word
-from src.get_nodes import node_length
+from digup.count_words import word_count, WordCount, Word
+from digup.get_nodes import node_length
 
 
 def test_1():

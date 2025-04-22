@@ -1,7 +1,7 @@
 from textwrap import dedent
 
-from src.present import present_word_count
-from src.count_words import WordCount, Word
+from digup.present import present_word_count
+from digup.count_words import WordCount, Word
 
 
 def test_display_word_count():

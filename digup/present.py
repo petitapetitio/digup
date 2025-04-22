@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TypeVar, Iterable, Callable
 
-from src.aggregation import Aggregation
-from src.count_words import WordCount
-from src.get_nodes import Node
+from digup.aggregation import Aggregation
+from digup.count_words import WordCount
+from digup.get_nodes import Node
 
 TableItem = TypeVar("TableItem")
 

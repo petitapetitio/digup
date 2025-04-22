@@ -2,8 +2,8 @@ import ast
 from textwrap import dedent
 from typing import cast
 
-from src.count_words import WordCount, Word, word_count
-from src.get_nodes import node_length
+from digup.count_words import WordCount, Word, word_count
+from digup.get_nodes import node_length
 
 
 def test_empty_class():

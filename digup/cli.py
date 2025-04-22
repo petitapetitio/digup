@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 from textwrap import dedent
 
-from src.commands import run_wc, run_hi, run_ls
+from digup.commands import run_wc, run_hi, run_ls
 
 
 def main():

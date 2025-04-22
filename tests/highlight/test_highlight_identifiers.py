@@ -1,7 +1,7 @@
 from textwrap import dedent
 
-from src.highlight import highlight_identifiers, IdentifierToHighlight
-from src.limits import FirstN
+from digup.highlight import highlight_identifiers, IdentifierToHighlight
+from digup.limits import FirstN
 
 
 def test_highlighting_identifiers_simple():

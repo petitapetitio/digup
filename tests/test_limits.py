@@ -1,4 +1,4 @@
-from src.limits import NoLimit, FirstN, LastN, MostN, LeastN
+from digup.limits import NoLimit, FirstN, LastN, MostN, LeastN
 
 
 def test_no_limit():

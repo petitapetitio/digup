@@ -1,11 +1,11 @@
 from pathlib import Path
 
-from src.count_words import word_count
-from src.limits import LeastN, MostN, FirstN, LastN, NoLimit
-from src.present import present_word_count, present_aggregation, present_nodes, LsItem
-from src.highlight import highlight_identifiers, present_highlights
-from src.get_nodes import get_functions, get_classes, get_modules, Node
-from src.aggregation import Aggregation
+from digup.count_words import word_count
+from digup.limits import LeastN, MostN, FirstN, LastN, NoLimit
+from digup.present import present_word_count, present_aggregation, present_nodes, LsItem
+from digup.highlight import highlight_identifiers, present_highlights
+from digup.get_nodes import get_functions, get_classes, get_modules, Node
+from digup.aggregation import Aggregation
 
 
 def run_wc(args):

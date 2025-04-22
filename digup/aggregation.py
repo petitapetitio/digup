@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Iterable
 
-from src.count_words import WordCount
+from digup.count_words import WordCount
 
 
 @dataclass(frozen=True)
